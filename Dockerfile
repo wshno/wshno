@@ -1,9 +1,9 @@
-FROM node:24-alpine AS deps
+FROM node:26-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
-FROM node:24-alpine AS build
+FROM node:26-alpine AS build
 ARG APP_VERSION=unknown
 ARG GIT_SHA=unknown
 WORKDIR /app
