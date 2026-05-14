@@ -26,5 +26,4 @@ jobs:
     with:
       node_enabled: true
       node_version: "24.x"
-      node_working_directory: "."
       node_test_enabled: false
