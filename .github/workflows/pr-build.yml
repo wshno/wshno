@@ -1,0 +1,30 @@
+name: "PR build for wsh-site"
+
+# Thin trigger: delegates typecheck/build to the pr-build reusable workflow.
+# node-only repo; dotnet/python disabled. No test script defined yet, so
+# node_test_enabled is false until tests land.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+concurrency:
+  group: "${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.ref }}"
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  pr-build:
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: write
+      checks: write
+    uses: hwinther/reusable-workflows/.github/workflows/pr-build.yml@25185e2df48cbdd90df1a8ec70b01e9911aaadbc # v1.56.0
+    secrets: inherit
+    with:
+      node_enabled: true
+      node_version: "24.x"
+      node_working_directory: "."
+      node_test_enabled: false
