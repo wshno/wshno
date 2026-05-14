@@ -1,0 +1,71 @@
+# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directories:
+      - "/"
+    open-pull-requests-limit: 20
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+    assignees:
+      - "hwinther"
+
+  - package-ecosystem: "docker"
+    directories:
+      - "/"
+    open-pull-requests-limit: 20
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+    assignees:
+      - "hwinther"
+
+  - package-ecosystem: "npm"
+    directories:
+      - "/"
+    open-pull-requests-limit: 20
+    target-branch: "main"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+    assignees:
+      - "hwinther"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
+    groups:
+      types:
+        patterns:
+          - "@types/*"
+      react:
+        patterns:
+          - "react"
+          - "react-*"
+          - "@types/react*"
+      react-router:
+        patterns:
+          - "react-router"
+          - "react-router-*"
+          - "@react-router/*"
+      vite:
+        patterns:
+          - "vite"
+          - "vite-*"
+          - "@vitejs/*"
+          - "vitest"
+          - "@vitest/*"
+      eslint:
+        patterns:
+          - "eslint"
+          - "eslint-*"
+          - "@eslint/*"
+          - "typescript-eslint"
+          - "@typescript-eslint/*"
+      code-quality:
+        patterns:
+          - "prettier"
+          - "@cspell/*"

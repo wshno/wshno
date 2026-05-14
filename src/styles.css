@@ -1,0 +1,252 @@
+/* ─────────────────────────────────────────────────────────
+   WSH — homage to the 2011 wshosting.org
+   Original design: Volker Mentzner
+   Palette preserved; markup modernized for React SPA
+   ───────────────────────────────────────────────────────── */
+:root {
+  --orange: #ffa600;
+  --orange-soft: #ffd380;
+  --bg: #f2f2f2;
+  --ink: #000;
+  --ink-dim: #555;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  color: var(--ink);
+  background-color: var(--bg);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 100.1%;
+}
+
+a:link,
+a:visited,
+a:hover {
+  color: var(--ink);
+}
+
+/* Original 700px "wrap" card with the thick orange side-borders */
+.wrap {
+  background-color: #fff;
+  margin: 0 auto 10px auto;
+  padding: 0;
+  width: 700px;
+  max-width: calc(100vw - 24px);
+  border: 1px solid var(--orange);
+  border-left: 10px solid var(--orange);
+  border-right: 10px solid var(--orange);
+  box-sizing: border-box;
+}
+
+.wrap p {
+  font-size: 90%;
+  margin: 5px 10px 10px 10px;
+  line-height: 130%;
+}
+
+.wrap h1 {
+  font-size: 130%;
+  margin: 10px 10px 5px 10px;
+}
+.wrap h2 {
+  font-size: 110%;
+  margin: 10px 10px 5px 10px;
+}
+
+.wrap ul {
+  margin: 5px 10px 15px 30px;
+  padding: 0;
+}
+.wrap li {
+  font-size: 90%;
+  margin: 5px 0;
+  line-height: 130%;
+}
+
+/* Tables — original styling */
+.wrap table {
+  margin: 5px 10px 10px 10px;
+  border-collapse: collapse;
+  border: 1px solid var(--orange);
+}
+.wrap th {
+  font-size: 90%;
+  padding: 2px 10px;
+  background-color: var(--orange-soft);
+  border: 1px solid var(--orange);
+  text-align: left;
+}
+.wrap td {
+  font-size: 90%;
+  padding: 2px 10px;
+  border: 1px solid var(--orange);
+}
+
+.wrap input,
+.wrap textarea {
+  margin: 0 10px 5px 10px;
+  border: 1px solid var(--orange);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 90%;
+  padding: 3px 5px;
+  box-sizing: border-box;
+}
+.wrap input[type="text"],
+.wrap input[type="email"],
+.wrap textarea {
+  width: calc(100% - 30px);
+}
+.wrap textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+.wrap button {
+  margin: 0 10px 10px 10px;
+  padding: 4px 14px;
+  background: var(--orange-soft);
+  border: 1px solid var(--orange);
+  font: 90% Arial, Helvetica, sans-serif;
+  cursor: pointer;
+}
+.wrap button:hover {
+  background: var(--orange);
+}
+
+/* Page title card */
+#pagetitle {
+  text-align: center;
+}
+#pagetitle .title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 6px 0;
+}
+#pagetitle img {
+  width: 42px;
+  height: 42px;
+  display: block;
+}
+#pagetitle h1 {
+  margin: 0;
+}
+
+/* Nav */
+#navmenu ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  white-space: nowrap;
+  text-align: center;
+}
+#navmenu li {
+  font-size: 90%;
+  font-weight: bold;
+  line-height: 130%;
+  display: inline;
+}
+#navmenu a {
+  padding: 2px 10px;
+  text-decoration: none;
+  cursor: pointer;
+}
+#navmenu a.active {
+  background-color: var(--orange-soft);
+  border-left: 1px solid var(--orange);
+  border-right: 1px solid var(--orange);
+}
+#navmenu a:hover {
+  background-color: var(--orange);
+  color: #000;
+}
+
+/* Banner photo — original head.jpg */
+#header {
+  height: 220px;
+  background-image: url("/head.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+/* Footer */
+#footer p {
+  margin: 5px 10px;
+  font-size: 80%;
+  color: var(--ink-dim);
+}
+
+/* Tag chips */
+.tags {
+  margin: 4px 10px 10px 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.tag {
+  display: inline-block;
+  font-size: 75%;
+  padding: 1px 7px;
+  border: 1px solid var(--orange);
+  background: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  cursor: default;
+}
+button.tag {
+  cursor: pointer;
+}
+.tag.active {
+  background: var(--orange-soft);
+}
+
+/* Project rows */
+.project {
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid var(--orange);
+  background: #fffdf6;
+}
+.project h2 {
+  margin: 0 0 4px 0;
+  font-size: 105%;
+}
+.project .meta {
+  font-size: 80%;
+  color: var(--ink-dim);
+  margin: 0 0 8px 0;
+}
+.project p {
+  margin: 0 0 6px 0;
+  font-size: 90%;
+  line-height: 130%;
+}
+.project a.outlink {
+  display: inline-block;
+  font-size: 80%;
+  margin-top: 4px;
+  text-decoration: underline;
+}
+
+/* Fine print */
+.legend {
+  margin: 0 10px 10px 10px;
+  font-size: 78%;
+  color: var(--ink-dim);
+  line-height: 140%;
+}
+
+/* Small-screen tweaks (original was 700px fixed) */
+@media (max-width: 720px) {
+  .wrap {
+    border-left-width: 6px;
+    border-right-width: 6px;
+  }
+  #header {
+    height: 140px;
+  }
+}
