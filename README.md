@@ -35,6 +35,9 @@ npm run preview  # preview the production build
 │   ├── App.jsx           # shell — title bar, nav, banner, footer
 │   ├── main.jsx          # entry point — mounts <BrowserRouter>
 │   └── styles.css        # all styling — preserves original palette
+├── server/
+│   └── server.go         # stdlib-only static file server (container runtime)
+├── Dockerfile            # multi-stage build → distroless runtime image
 └── index.html            # Vite HTML entry
 ```
 
@@ -62,9 +65,18 @@ The CSS preserves the original palette as custom properties at the top of `src/s
 
 ## Deploying
 
-The build outputs static files to `dist/`. Any static host works (Vercel, Netlify, GitHub Pages, plain nginx). If you deploy under a subpath, set Vite's `base` option in `vite.config.js`.
+The build outputs static files to `dist/`, so any static host works (Vercel, Netlify, GitHub Pages, etc.). Because we use `BrowserRouter`, a dumb static host needs to rewrite unknown paths to `/index.html` (single-page-app rewrite) — on Netlify drop a `public/_redirects` file with `/* /index.html 200`; on Vercel it's automatic. If you deploy under a subpath, set Vite's `base` option in `vite.config.js`.
 
-Because we use `BrowserRouter`, the host needs to rewrite unknown paths to `/index.html` (single-page-app rewrite). On Netlify drop a `public/_redirects` file with `/* /index.html 200`; on Vercel it's automatic.
+The canonical deploy is a **container**: a multi-stage `Dockerfile` builds the site and serves it from `server/server.go` (a tiny stdlib-only Go file server — SPA fallback, immutable `/assets/` caching) on a **distroless, non-root** base, listening on port `8080`. CI (`.github/workflows/container.yml`) builds, Grype-scans, and publishes it to `ghcr.io/.../web` on tagged releases. Run it locally with:
+
+```bash
+docker build -t wsh-site .
+docker run --rm -p 8080:8080 wsh-site   # http://localhost:8080
+```
+
+### PR preview environments
+
+Label a pull request **`deploy-feature`** and CI deploys an ephemeral preview to the homelab cluster via GitOps (rendered into `hwinther/proxmox`, reconciled by Flux) at `https://wshno-<PR>.preview.wsh.no`. A sticky PR comment posts the URL; closing the PR tears the env down. The live `/status` data is production-only, so it shows "could not load" in previews.
 
 ## Contact form
 
