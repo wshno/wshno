@@ -22,8 +22,8 @@ on:
       - "package.json"
       - "package-lock.json"
       - "vite.config.js"
+      - "server/**"
       - "Dockerfile"
-      - "nginx.conf"
       - ".dockerignore"
       - ".github/workflows/container.yml"
 

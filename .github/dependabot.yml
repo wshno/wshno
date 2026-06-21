@@ -27,6 +27,10 @@ updates:
       day: "sunday"
     assignees:
       - "hwinther"
+    groups:
+      docker-base-images:
+        patterns:
+          - "*"
 
   - package-ecosystem: "npm"
     directories:
