@@ -3,11 +3,13 @@ import { useEffect } from "react";
 import About from "./pages/About.jsx";
 import Projects from "./pages/Projects.jsx";
 import Contact from "./pages/Contact.jsx";
+import Status from "./pages/Status.jsx";
 import wshIcon from "./assets/wsh-icon.svg";
 
 const PAGES = [
   { path: "/", label: "About Us", title: "WsHosting.Org / About" },
   { path: "/projects", label: "Projects", title: "WsHosting.Org / Projects" },
+  { path: "/status", label: "Status", title: "WsHosting.Org / Status" },
   { path: "/contact", label: "Contact", title: "WsHosting.Org / Contact" },
 ];
 
@@ -50,6 +52,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<About />} />
         <Route path="/projects" element={<Projects />} />
+        <Route path="/status" element={<Status />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="*" element={<About />} />
       </Routes>

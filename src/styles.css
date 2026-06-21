@@ -240,6 +240,48 @@ button.tag {
   line-height: 140%;
 }
 
+/* Valheim status widget */
+.status-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.status-head h2 {
+  margin: 0;
+}
+.status-pill {
+  font-size: 75%;
+  font-weight: bold;
+  padding: 2px 9px;
+  border: 1px solid var(--orange);
+  background: #fff;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.status-up {
+  background: #d7f5dd;
+  border-color: #1a7f37;
+  color: #0f5023;
+}
+.status-down {
+  background: #f7d9d9;
+  border-color: #cc3333;
+  color: #7a1d1d;
+}
+.status-stale {
+  background: var(--orange-soft);
+  border-color: var(--orange);
+  color: #6a4a00;
+}
+.status-loading,
+.status-unknown {
+  background: #ececec;
+  border-color: #bbb;
+  color: var(--ink-dim);
+}
+
 /* Small-screen tweaks (original was 700px fixed) */
 @media (max-width: 720px) {
   .wrap {
