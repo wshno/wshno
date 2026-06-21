@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
 
-// Same-origin: Traefik routes /api/valheim/* to the in-cluster valheim-status snapshot service,
+// Same-origin: Traefik routes /api/<game>/* to the in-cluster <game>-status snapshot service,
 // which serves a curated JSON built from Prometheus. Grafana/Prometheus stay private.
-const ENDPOINT = "/api/valheim/status.json";
+// Add a game by appending one entry here — the backend (<game>-status service + /api route)
+// lives in the cluster (proxmox), not this repo.
+const SERVERS = [
+  { name: "Valheim", endpoint: "/api/valheim/status.json" },
+  { name: "Enshrouded", endpoint: "/api/enshrouded/status.json" },
+];
 const POLL_MS = 30000;
 const STALE_AFTER = 180; // seconds without a fresh snapshot before we distrust "up"
 
@@ -50,7 +55,7 @@ const LABELS = {
   unknown: "Unknown",
 };
 
-export default function Status() {
+function ServerStatus({ name, endpoint }) {
   const [data, setData] = useState(null);
   const [err, setErr] = useState(null);
 
@@ -58,7 +63,7 @@ export default function Status() {
     let alive = true;
     const load = async () => {
       try {
-        const r = await fetch(ENDPOINT, { cache: "no-store" });
+        const r = await fetch(endpoint, { cache: "no-store" });
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         const j = await r.json();
         if (alive) {
@@ -75,7 +80,7 @@ export default function Status() {
       alive = false;
       clearInterval(id);
     };
-  }, []);
+  }, [endpoint]);
 
   const stale = data && Date.now() / 1000 - data.updated > STALE_AFTER;
   const state = err && !data
@@ -89,39 +94,47 @@ export default function Status() {
           : "down";
 
   return (
-    <section className="wrap">
-      <p>
-        Live status of our public <strong>Valheim</strong> server. Snapshot from
-        the cluster's metrics, refreshed about once a minute — no login required.
+    <article className="project">
+      <div className="status-head">
+        <h2>{data?.server || name}</h2>
+        <span className={"status-pill status-" + state}>{LABELS[state]}</span>
+      </div>
+
+      <p className="meta">
+        {data ? (
+          <>
+            Players: <strong>{data.players ?? "—"}</strong>
+            {data.maxPlayers ? ` / ${data.maxPlayers}` : ""} · updated{" "}
+            {ago(data.updated)}
+          </>
+        ) : err ? (
+          "Could not load status right now."
+        ) : (
+          "Loading…"
+        )}
       </p>
 
-      <article className="project">
-        <div className="status-head">
-          <h2>{data?.server || "Valheim"}</h2>
-          <span className={"status-pill status-" + state}>{LABELS[state]}</span>
-        </div>
+      {data?.history?.players?.length > 1 && (
+        <>
+          <Sparkline points={data.history.players} />
+          <p className="legend">Players online — last 24 hours</p>
+        </>
+      )}
+    </article>
+  );
+}
 
-        <p className="meta">
-          {data ? (
-            <>
-              Players: <strong>{data.players ?? "—"}</strong>
-              {data.maxPlayers ? ` / ${data.maxPlayers}` : ""} · updated{" "}
-              {ago(data.updated)}
-            </>
-          ) : err ? (
-            "Could not load status right now."
-          ) : (
-            "Loading…"
-          )}
-        </p>
+export default function Status() {
+  return (
+    <section className="wrap">
+      <p>
+        Live status of our public game servers. Snapshots from the cluster's
+        metrics, refreshed about once a minute — no login required.
+      </p>
 
-        {data?.history?.players?.length > 1 && (
-          <>
-            <Sparkline points={data.history.players} />
-            <p className="legend">Players online — last 24 hours</p>
-          </>
-        )}
-      </article>
+      {SERVERS.map((s) => (
+        <ServerStatus key={s.endpoint} name={s.name} endpoint={s.endpoint} />
+      ))}
     </section>
   );
 }
