@@ -5,8 +5,8 @@ Personal site for **Winther-Sørensen Hosting**. A React SPA that pays homage to
 ## Stack
 
 - [Vite](https://vitejs.dev/) — dev server + build
-- [React 18](https://react.dev/)
-- [React Router 6](https://reactrouter.com/) — browser-history routing
+- [React 19](https://react.dev/)
+- [React Router 7](https://reactrouter.com/) (`react-router-dom`) — browser-history routing
 
 ## Quick start
 
@@ -30,6 +30,7 @@ npm run preview  # preview the production build
 │   ├── pages/
 │   │   ├── About.jsx     # landing — about copy + legacy price table
 │   │   ├── Projects.jsx  # tag-filtered list of projects
+│   │   ├── Status.jsx    # live Valheim server status (polls /api/valheim/status.json)
 │   │   └── Contact.jsx   # contact form (mailto: fallback, no backend)
 │   ├── App.jsx           # shell — title bar, nav, banner, footer
 │   ├── main.jsx          # entry point — mounts <BrowserRouter>
@@ -55,6 +56,7 @@ The CSS preserves the original palette as custom properties at the top of `src/s
 |--------------|------------------------|
 | `/`          | `About`                |
 | `/projects`  | `Projects`             |
+| `/status`    | `Status`               |
 | `/contact`   | `Contact`              |
 | `*`          | falls back to `About`  |
 
