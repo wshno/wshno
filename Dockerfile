@@ -6,13 +6,13 @@ COPY server/server.go ./
 RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /server .
 
 # --- frontend deps ---
-FROM node:24-alpine AS deps
+FROM node:26-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
 # --- frontend build ---
-FROM node:24-alpine AS build
+FROM node:26-alpine AS build
 ARG APP_VERSION=unknown
 ARG GIT_SHA=unknown
 WORKDIR /app
