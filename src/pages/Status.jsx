@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 const SERVERS = [
   { name: "Valheim", endpoint: "/api/valheim/status.json" },
   { name: "Enshrouded", endpoint: "/api/enshrouded/status.json" },
+  { name: "Satisfactory", endpoint: "/api/satisfactory/status.json" },
 ];
 const POLL_MS = 30000;
 const STALE_AFTER = 180; // seconds without a fresh snapshot before we distrust "up"
@@ -93,6 +94,9 @@ function ServerStatus({ name, endpoint }) {
           ? "up"
           : "down";
 
+  // Satisfactory exposes a progression stat the others don't; show it only when present.
+  const techTier = data?.techTier ?? data?.tech_tier ?? null;
+
   return (
     <article className="project">
       <div className="status-head">
@@ -104,8 +108,13 @@ function ServerStatus({ name, endpoint }) {
         {data ? (
           <>
             Players: <strong>{data.players ?? "—"}</strong>
-            {data.maxPlayers ? ` / ${data.maxPlayers}` : ""} · updated{" "}
-            {ago(data.updated)}
+            {data.maxPlayers ? ` / ${data.maxPlayers}` : ""}
+            {techTier != null ? (
+              <>
+                {" "}· tech tier <strong>{techTier}</strong>
+              </>
+            ) : null}{" "}
+            · updated {ago(data.updated)}
           </>
         ) : err ? (
           "Could not load status right now."
