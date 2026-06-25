@@ -8,6 +8,7 @@ const SERVERS = [
   { name: "Valheim", endpoint: "/api/valheim/status.json" },
   { name: "Enshrouded", endpoint: "/api/enshrouded/status.json" },
   { name: "Satisfactory", endpoint: "/api/satisfactory/status.json" },
+  { name: "Space Engineers", endpoint: "/api/spaceengineers/status.json" },
 ];
 const POLL_MS = 30000;
 const STALE_AFTER = 180; // seconds without a fresh snapshot before we distrust "up"
