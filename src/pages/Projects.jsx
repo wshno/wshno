@@ -2,6 +2,14 @@ import { useMemo, useState } from "react";
 
 const PROJECTS = [
   {
+    title: "Skylens",
+    year: "2026 — current",
+    tags: ["android", "react native", "aspnet core", "ar"],
+    description:
+      "An augmented-reality plane- and ship-spotter for Android: it overlays live aircraft and vessel labels onto the camera view using GPS and compass/gyro fusion, backed by a live ADS-B/AIS feed. Restricted preview — available to known users only, not open to the public.",
+    href: null,
+  },
+  {
     title: "WSH VSCode Extension",
     year: "2026 — current",
     tags: ["vscode", "typescript", "tooling"],

@@ -4,6 +4,8 @@ import About from "./pages/About.jsx";
 import Projects from "./pages/Projects.jsx";
 import Contact from "./pages/Contact.jsx";
 import Status from "./pages/Status.jsx";
+import SkylensPrivacy from "./pages/SkylensPrivacy.jsx";
+import SkylensDeleteData from "./pages/SkylensDeleteData.jsx";
 import wshIcon from "./assets/wsh-icon.svg";
 
 const PAGES = [
@@ -13,10 +15,19 @@ const PAGES = [
   { path: "/contact", label: "Contact", title: "WsHosting.Org / Contact" },
 ];
 
+// Pages with their own route + title but intentionally NOT in the top nav —
+// app-specific legal pages deep-linked from the Skylens Google Play listing.
+const UNLISTED_PAGES = [
+  { path: "/skylens/privacy", title: "WsHosting.Org / Skylens Privacy Policy" },
+  { path: "/skylens/delete-data", title: "WsHosting.Org / Skylens Data Deletion" },
+];
+
 export default function App() {
   const loc = useLocation();
   const current =
-    PAGES.find((p) => p.path === loc.pathname) || PAGES[0];
+    PAGES.find((p) => p.path === loc.pathname) ||
+    UNLISTED_PAGES.find((p) => p.path === loc.pathname) ||
+    PAGES[0];
 
   useEffect(() => {
     document.title = current.title;
@@ -54,6 +65,8 @@ export default function App() {
         <Route path="/projects" element={<Projects />} />
         <Route path="/status" element={<Status />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/skylens/privacy" element={<SkylensPrivacy />} />
+        <Route path="/skylens/delete-data" element={<SkylensDeleteData />} />
         <Route path="*" element={<About />} />
       </Routes>
 
