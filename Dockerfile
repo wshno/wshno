@@ -1,5 +1,5 @@
 # --- static file server (stdlib-only Go binary; see server/server.go) ---
-FROM golang:1.26-alpine AS server
+FROM golang:1.27-alpine AS server
 WORKDIR /src
 COPY server/go.mod ./
 COPY server/server.go ./
