@@ -35,6 +35,7 @@ updates:
   - package-ecosystem: "npm"
     directories:
       - "/"
+      - "/e2e"
     open-pull-requests-limit: 20
     target-branch: "main"
     schedule:

@@ -1,5 +1,8 @@
 name: "Publish web container to GHCR"
 
+# Release image: built, scanned, pushed and signed on v* tags (tag-and-release.yml dispatches this
+# workflow at the tag ref). Pull requests go through pr-e2e.yml instead.
+
 on:
   workflow_dispatch:
     inputs:
@@ -10,31 +13,14 @@ on:
   push:
     tags:
       - "v*"
-  pull_request:
-    # `labeled` so adding `deploy-feature` to an already-open PR triggers a deploy without a new push.
-    types: [opened, synchronize, reopened, labeled]
-    branches:
-      - main
-    paths:
-      - "src/**"
-      - "public/**"
-      - "index.html"
-      - "package.json"
-      - "package-lock.json"
-      - "vite.config.ts"
-      - "tsconfig.json"
-      - "server/**"
-      - "Dockerfile"
-      - ".dockerignore"
-      - ".github/workflows/container.yml"
 
 concurrency:
-  group: "${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}"
+  group: "${{ github.workflow }} @ ${{ github.ref }}"
   cancel-in-progress: true
 
 jobs:
   web_container:
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) || github.event_name == 'pull_request'
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
     permissions:
       contents: read
       packages: write
@@ -52,44 +38,32 @@ jobs:
       dockerfile: Dockerfile
       grype_fail_build: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.grype_fail_build == 'false' && 'never' || 'auto' }}
 
-  # Deploy a per-PR preview env when the PR carries the `deploy-feature` label. web_container above
-  # already built + pushed the image, so we just hand its tag + digest to the generic preview-upsert
-  # reusable, which renders the per-PR overlay into hwinther/proxmox. Flux reconciles within ~1 min at
-  # https://wshno-<PR>.preview.wsh.no — no merge or manual image bump needed to see the changes.
-  preview:
+  # Renders deploy/ with the image just pushed (tag@digest), and ships it as a signed OCI artifact
+  # (ghcr.io/wshno/wshno/manifests:<version>) for Flux in hwinther/proxmox to pull. Release builds
+  # only: the tag-and-release workflow dispatches this workflow at the tag ref, so the cosign
+  # identity is container.yml@refs/tags/v*, which the OCIRepository verify pins.
+  manifests:
     needs: web_container
-    if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'deploy-feature') }}
-    permissions:
-      contents: read
-    uses: hwinther/reusable-workflows/.github/workflows/gitops-preview-upsert.yml@c1e80ad637dcdd38bb6de0f447475c40a8625141 # v2.9.0
-    with:
-      target_repo: hwinther/proxmox
-      preview_base_path: clusters/production/apps/previews/wshno
-      pr_number: ${{ github.event.pull_request.number }}
-      app_name: wshno
-      host: wshno-${{ github.event.pull_request.number }}.preview.wsh.no
-      image_tag: ${{ needs.web_container.outputs.version }}
-      image_digest: ${{ needs.web_container.outputs.image_digest }}
-    secrets:
-      app_id: ${{ secrets.PROXMOX_GITOPS_APP_ID }}
-      app_private_key: ${{ secrets.PROXMOX_GITOPS_APP_PRIVATE_KEY }}
-
-  preview-comment:
-    needs: preview
-    if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'deploy-feature') }}
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write
+      contents: read
+      packages: write
+      id-token: write
     steps:
-      - name: Post preview URL
-        uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          header: wshno-preview-env
-          message: |
-            ### Preview environment deployed
+          persist-credentials: false
 
-            🔍 https://wshno-${{ github.event.pull_request.number }}.preview.wsh.no
-
-            Refreshes on every push to this PR while the `deploy-feature` label is set; torn down when
-            the PR closes. (The /status page's live data is only wired up in production, so it reads
-            "could not load" here.)
+      # Signed in this job, so the artifact's cosign identity is container.yml@refs/tags/v*, which
+      # the cluster's OCIRepository pins. A single file at the root: the Flux Kustomization applies
+      # everything under its path.
+      - name: Render, validate, push and sign
+        uses: hwinther/reusable-workflows/.github/actions/manifests@c1e80ad637dcdd38bb6de0f447475c40a8625141 # v2.9.0
+        with:
+          mode: push
+          artifact: ghcr.io/wshno/wshno/manifests
+          tag: ${{ needs.web_container.outputs.version }}
+          images: ghcr.io/wshno/wshno/web:${{ needs.web_container.outputs.version }}@${{ needs.web_container.outputs.image_digest }}
+          renders: wshno.yaml=deploy

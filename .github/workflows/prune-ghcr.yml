@@ -22,7 +22,7 @@ on:
       images:
         description: "Comma-separated package names to prune. Blank = let the reusable workflow auto-discover by prefix."
         type: string
-        default: "wshno/web"
+        default: "wshno/web,wshno/manifests"
       nuke_package:
         description: "DESTRUCTIVE. Package name (e.g. 'wshno/web') to delete entirely — leave blank for normal smart prune."
         type: string
@@ -52,7 +52,7 @@ jobs:
       # Schedule events don't expose `inputs`, so mirror the workflow_dispatch
       # default as a single-line comma string. Keep this in sync with the
       # `images` input default above.
-      images: ${{ inputs.images || 'wshno/web' }}
+      images: ${{ inputs.images || 'wshno/web,wshno/manifests' }}
       package_namespace_prefix: wshno/
       # When set on a manual run, bypasses the smart prune and deletes the
       # entire named package via the GHCR package DELETE API. Cron runs leave

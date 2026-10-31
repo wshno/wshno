@@ -1,0 +1,33 @@
+# E2E compose stack for pr-e2e.yml (and local Playwright runs against a built image).
+#
+# The site image as it runs in the cluster: the stdlib Go server (server/server.go) serving the
+# built SPA on 8080. The /api/<game> status snapshots are cluster services, not part of the image;
+# the specs that need them serve their own.
+#
+# The image ref comes from WEB_IMAGE, so the same file works for any digest:
+#   WEB_IMAGE=ghcr.io/wshno/wshno/web@sha256:...
+# pr-e2e.yml sets it to the build hand-off. For a local run:
+#   docker build -t wshno:dev .
+#   WEB_IMAGE=wshno:dev docker compose -f docker-compose.e2e.yml up -d --wait
+
+services:
+  web:
+    image: ${WEB_IMAGE:?set WEB_IMAGE to the site image ref, e.g. ghcr.io/wshno/wshno/web@sha256:...}
+    ports:
+      - '8080:8080'
+
+  # Readiness gate. The distroless image has no shell or curl, so `web` carries no healthcheck of
+  # its own. `docker compose up --wait` blocks until this sidecar's probe of / reports healthy. (A
+  # run-to-completion sidecar does NOT gate --wait; only a long-running service with a healthcheck does.)
+  web-ready:
+    image: curlimages/curl:8.10.1
+    depends_on:
+      web:
+        condition: service_started
+    entrypoint: ['sh', '-c', 'sleep 3600']
+    healthcheck:
+      test: ['CMD', 'curl', '-fsS', 'http://web:8080/']
+      interval: 3s
+      timeout: 3s
+      retries: 40
+      start_period: 3s

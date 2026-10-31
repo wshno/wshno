@@ -12,3 +12,7 @@ coverage
 Dockerfile
 .dockerignore
 README.md
+# Not part of the image
+e2e
+deploy
+docker-compose.e2e.yml
