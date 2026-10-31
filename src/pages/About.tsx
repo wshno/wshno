@@ -1,23 +1,20 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom'
 
 export default function About() {
   return (
     <>
       <section className="wrap">
         <p>
-          WsHosting is a one-person company that historically dealt with web
-          hosting, email and game servers. These days it's mostly a home for
-          personal projects, experiments, and the occasional tool released into
-          the wild.
+          WsHosting is a one-person company that historically dealt with web hosting, email and game servers. These days
+          it's mostly a home for personal projects, experiments, and the occasional tool released into the wild.
         </p>
         <p>&nbsp;</p>
       </section>
 
       <section className="wrap">
         <p>
-          The original price list — preserved here as a museum piece. Nothing
-          on it is currently for sale, but if you have a project in mind feel
-          free to <Link to="/contact">get in touch</Link>.
+          The original price list — preserved here as a museum piece. Nothing on it is currently for sale, but if you
+          have a project in mind feel free to <Link to="/contact">get in touch</Link>.
         </p>
 
         <table summary="historical pricelist">
@@ -51,7 +48,7 @@ export default function About() {
           <tbody>
             <tr>
               <td>Setup fee</td>
-              <td style={{ color: "red" }}>$0</td>
+              <td style={{ color: 'red' }}>$0</td>
             </tr>
             <tr>
               <td>Domain name registration (com / net / org)</td>
@@ -61,10 +58,9 @@ export default function About() {
         </table>
 
         <p className="legend">
-          Archived from <code>wshosting.org</code>, c. 2011. Current rates by
-          quote only.
+          Archived from <code>wshosting.org</code>, c. 2011. Current rates by quote only.
         </p>
       </section>
     </>
-  );
+  )
 }
