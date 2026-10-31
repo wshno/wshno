@@ -1,0 +1,15 @@
+# Workload manifests for the wsh.no site, shipped as a signed OCI artifact
+# (ghcr.io/wshno/wshno/manifests:<version>) by the `manifests` job in container.yml.
+# The cluster side (namespace, network policies, the Ingress for wsh.no and www.wsh.no, which also
+# routes /api/<game> to the cluster's game-status services) lives in hwinther/proxmox. See README.md.
+#
+# Never commit rendered output. CI pins the image to tag@digest at release time; the tag here is
+# only a placeholder so `kubectl kustomize deploy` renders locally.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- deployment.yaml
+- service.yaml
+images:
+- name: ghcr.io/wshno/wshno/web
+  newTag: 0.0.0-dev

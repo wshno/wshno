@@ -5,6 +5,8 @@ import { base, ignores, node, react } from '@wshno/eslint-config'
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   ...ignores,
+  // e2e/ is its own package with its own eslint config.
+  { ignores: ['e2e/**'] },
   ...base,
   ...react,
   ...node.map((c) => ({ ...c, files: ['vite.config.ts', 'eslint.config.js'] })),
