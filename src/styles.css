@@ -96,8 +96,8 @@ a:hover {
   padding: 3px 5px;
   box-sizing: border-box;
 }
-.wrap input[type="text"],
-.wrap input[type="email"],
+.wrap input[type='text'],
+.wrap input[type='email'],
 .wrap textarea {
   width: calc(100% - 30px);
 }
@@ -110,7 +110,10 @@ a:hover {
   padding: 4px 14px;
   background: var(--orange-soft);
   border: 1px solid var(--orange);
-  font: 90% Arial, Helvetica, sans-serif;
+  font:
+    90% Arial,
+    Helvetica,
+    sans-serif;
   cursor: pointer;
 }
 .wrap button:hover {
@@ -169,7 +172,7 @@ a:hover {
 /* Banner photo — original head.jpg */
 #header {
   height: 220px;
-  background-image: url("/head.jpg");
+  background-image: url('/head.jpg');
   background-size: cover;
   background-position: center;
 }

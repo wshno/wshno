@@ -1,3 +1,7 @@
 dist/
 package-lock.json
 public/
+.github/
+.vscode/
+GitVersion.yml
+*.md

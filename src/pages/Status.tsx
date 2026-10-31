@@ -1,57 +1,47 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
 
 /** A [unix seconds, value] sample. */
-type Point = [number, number];
+type Point = [number, number]
 
 /** The curated snapshot the <game>-status service serves. */
 interface Snapshot {
-  server?: string;
-  up: number;
-  updated: number;
-  players?: number;
-  maxPlayers?: number;
-  techTier?: number;
-  tech_tier?: number;
-  history?: { players?: Point[] };
+  server?: string
+  up: number
+  updated: number
+  players?: number
+  maxPlayers?: number
+  techTier?: number
+  tech_tier?: number
+  history?: { players?: Point[] }
 }
 
-type State = "up" | "down" | "stale" | "loading" | "unknown";
+type State = 'up' | 'down' | 'stale' | 'loading' | 'unknown'
 
 // Same-origin: Traefik routes /api/<game>/* to the in-cluster <game>-status snapshot service,
 // which serves a curated JSON built from Prometheus. Grafana/Prometheus stay private.
 // Add a game by appending one entry here — the backend (<game>-status service + /api route)
 // lives in the cluster (proxmox), not this repo.
 const SERVERS = [
-  { name: "Valheim", endpoint: "/api/valheim/status.json" },
-  { name: "Enshrouded", endpoint: "/api/enshrouded/status.json" },
-  { name: "Satisfactory", endpoint: "/api/satisfactory/status.json" },
-  { name: "Space Engineers", endpoint: "/api/spaceengineers/status.json" },
-];
-const POLL_MS = 30000;
-const STALE_AFTER = 180; // seconds without a fresh snapshot before we distrust "up"
+  { name: 'Valheim', endpoint: '/api/valheim/status.json' },
+  { name: 'Enshrouded', endpoint: '/api/enshrouded/status.json' },
+  { name: 'Satisfactory', endpoint: '/api/satisfactory/status.json' },
+  { name: 'Space Engineers', endpoint: '/api/spaceengineers/status.json' },
+]
+const POLL_MS = 30000
+const STALE_AFTER = 180 // seconds without a fresh snapshot before we distrust "up"
 
-function Sparkline({
-  points,
-  height = 60,
-  stroke = "#ffa600",
-}: {
-  points: Point[];
-  height?: number;
-  stroke?: string;
-}) {
-  if (!points || points.length < 2) return null;
-  const width = 660;
-  const ts = points.map((p) => p[0]);
-  const vs = points.map((p) => p[1]);
-  const minT = Math.min(...ts);
-  const maxT = Math.max(...ts);
-  const maxV = Math.max(1, ...vs);
-  const x = (t: number) => ((t - minT) / (maxT - minT || 1)) * width;
-  const y = (v: number) => height - (v / maxV) * (height - 4) - 2;
-  const line = points
-    .map((p, i) => `${i ? "L" : "M"}${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`)
-    .join(" ");
-  const area = `${line} L${width},${height} L0,${height} Z`;
+function Sparkline({ points, height = 60, stroke = '#ffa600' }: { points: Point[]; height?: number; stroke?: string }) {
+  if (!points || points.length < 2) return null
+  const width = 660
+  const ts = points.map((p) => p[0])
+  const vs = points.map((p) => p[1])
+  const minT = Math.min(...ts)
+  const maxT = Math.max(...ts)
+  const maxV = Math.max(1, ...vs)
+  const x = (t: number) => ((t - minT) / (maxT - minT || 1)) * width
+  const y = (v: number) => height - (v / maxV) * (height - 4) - 2
+  const line = points.map((p, i) => `${i ? 'L' : 'M'}${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`).join(' ')
+  const area = `${line} L${width},${height} L0,${height} Z`
   return (
     <svg
       viewBox={`0 0 ${width} ${height}`}
@@ -64,84 +54,85 @@ function Sparkline({
       <path d={area} fill={stroke} opacity="0.15" />
       <path d={line} fill="none" stroke={stroke} strokeWidth="2" />
     </svg>
-  );
+  )
 }
 
 function ago(sec: number, now: number) {
-  const d = Math.max(0, Math.floor(now / 1000) - sec);
-  if (d < 60) return `${d}s ago`;
-  if (d < 3600) return `${Math.floor(d / 60)}m ago`;
-  return `${Math.floor(d / 3600)}h ago`;
+  const d = Math.max(0, Math.floor(now / 1000) - sec)
+  if (d < 60) return `${d}s ago`
+  if (d < 3600) return `${Math.floor(d / 60)}m ago`
+  return `${Math.floor(d / 3600)}h ago`
 }
 
 const LABELS: Record<State, string> = {
-  up: "Online",
-  down: "Offline",
-  stale: "Stale",
-  loading: "…",
-  unknown: "Unknown",
-};
+  up: 'Online',
+  down: 'Offline',
+  stale: 'Stale',
+  loading: '…',
+  unknown: 'Unknown',
+}
 
 function stateOf(data: Snapshot | null, err: string | null, now: number): State {
-  if (!data) return err ? "unknown" : "loading";
-  if (now / 1000 - data.updated > STALE_AFTER) return "stale";
-  return data.up === 1 ? "up" : "down";
+  if (!data) return err ? 'unknown' : 'loading'
+  if (now / 1000 - data.updated > STALE_AFTER) return 'stale'
+  return data.up === 1 ? 'up' : 'down'
 }
 
 function ServerStatus({ name, endpoint }: { name: string; endpoint: string }) {
-  const [data, setData] = useState<Snapshot | null>(null);
-  const [err, setErr] = useState<string | null>(null);
+  const [data, setData] = useState<Snapshot | null>(null)
+  const [err, setErr] = useState<string | null>(null)
   // When the last poll finished. Staleness and "updated … ago" are measured against it, so a
   // render never reads the clock; every poll (success or failure) re-renders with a new value.
-  const [checkedAt, setCheckedAt] = useState(() => Date.now());
+  const [checkedAt, setCheckedAt] = useState(() => Date.now())
 
   useEffect(() => {
-    let alive = true;
+    let alive = true
     const load = async () => {
       try {
-        const r = await fetch(endpoint, { cache: "no-store" });
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        const j = (await r.json()) as Snapshot;
+        const r = await fetch(endpoint, { cache: 'no-store' })
+        if (!r.ok) throw new Error(`HTTP ${r.status}`)
+        const j = (await r.json()) as Snapshot
         if (alive) {
-          setData(j);
-          setErr(null);
+          setData(j)
+          setErr(null)
         }
       } catch (e) {
-        if (alive) setErr(e instanceof Error ? e.message : String(e));
+        if (alive) setErr(e instanceof Error ? e.message : String(e))
       }
-      if (alive) setCheckedAt(Date.now());
-    };
-    load();
-    const id = setInterval(load, POLL_MS);
+      if (alive) setCheckedAt(Date.now())
+    }
+    load()
+    const id = setInterval(load, POLL_MS)
     return () => {
-      alive = false;
-      clearInterval(id);
-    };
-  }, [endpoint]);
+      alive = false
+      clearInterval(id)
+    }
+  }, [endpoint])
 
-  const state = stateOf(data, err, checkedAt);
+  const state = stateOf(data, err, checkedAt)
 
   // Satisfactory exposes a progression stat the others don't; show it only when present.
-  const techTier = data?.techTier ?? data?.tech_tier ?? null;
-  const noDataText = err ? "Could not load status right now." : "Loading…";
+  const techTier = data?.techTier ?? data?.tech_tier ?? null
+  const noDataText = err ? 'Could not load status right now.' : 'Loading…'
 
   return (
     <article className="project">
       <div className="status-head">
         <h2>{data?.server || name}</h2>
-        <span className={"status-pill status-" + state}>{LABELS[state]}</span>
+        <span className={'status-pill status-' + state}>{LABELS[state]}</span>
       </div>
 
       <p className="meta">
         {data ? (
           <>
-            Players: <strong>{data.players ?? "—"}</strong>
-            {data.maxPlayers ? ` / ${data.maxPlayers}` : ""}
+            Players: <strong>{data.players ?? '—'}</strong>
+            {data.maxPlayers ? ` / ${data.maxPlayers}` : ''}
             {techTier != null ? (
               <>
-                {" "}· tech tier <strong>{techTier}</strong>
+                {' '}
+                · tech tier <strong>{techTier}</strong>
               </>
-            ) : null}{" "}
+            ) : null}{' '}
             · updated {ago(data.updated, checkedAt)}
           </>
         ) : (
@@ -156,20 +147,20 @@ function ServerStatus({ name, endpoint }: { name: string; endpoint: string }) {
         </>
       )}
     </article>
-  );
+  )
 }
 
 export default function Status() {
   return (
     <section className="wrap">
       <p>
-        Live status of our public game servers. Snapshots from the cluster's
-        metrics, refreshed about once a minute — no login required.
+        Live status of our public game servers. Snapshots from the cluster's metrics, refreshed about once a minute — no
+        login required.
       </p>
 
       {SERVERS.map((s) => (
         <ServerStatus key={s.endpoint} name={s.name} endpoint={s.endpoint} />
       ))}
     </section>
-  );
+  )
 }
