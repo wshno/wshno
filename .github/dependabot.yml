@@ -51,6 +51,13 @@ updates:
       - dependency-name: "typescript"
         versions: [">=6.1"]
     groups:
+      # The shared configs peer on eslint and prettier, so they move together. First, because a
+      # dependency joins the first group that matches it.
+      wshno:
+        patterns:
+          - "@wshno/*"
+          - "eslint"
+          - "prettier"
       types:
         patterns:
           - "@types/*"
