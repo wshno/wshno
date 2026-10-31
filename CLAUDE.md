@@ -13,16 +13,18 @@ npm install
 npm run dev      # vite dev server, http://localhost:5173 (auto-opens browser)
 npm run build    # production build → dist/
 npm run preview  # serve the production build locally
+npm run typecheck && npm run lint   # tsc + eslint (both run in CI)
+npm run format   # prettier
 ```
 
-There is **no lint or test setup** — `package.json` defines only `dev`/`build`/`preview`, and CI runs with `node_test_enabled: false`. Don't reference a test runner that doesn't exist; if adding tests, also flip that flag in `.github/workflows/pr-build.yml`. Node 24 is the CI/build version.
+Lint, types and formatting come from the shared `@wshno` packages: `@wshno/eslint-config` (base + react), `@wshno/tsconfig/react-router.json` and `@wshno/prettier-config`. There is **no test setup**, and CI runs with `node_test_enabled: false`. Don't reference a test runner that doesn't exist; if adding tests, also flip that flag in `.github/workflows/pr-build.yml`. Node 24 is the CI/build version.
 
 ## Architecture
 
-- **Stack:** Vite 8 + React 19 + React Router 7 (`react-router-dom`), all `.jsx`, no TypeScript. (The README still says React 18 / Router 6 — it's stale; trust `package.json`.)
-- **Entry flow:** `src/main.jsx` mounts `<BrowserRouter>` → `src/App.jsx` is the shell (title bar, nav, banner, footer) and declares the `<Routes>`. Pages live in `src/pages/`.
+- **Stack:** Vite 8 + React 19 + React Router 7 (`react-router-dom`), TypeScript (`.tsx`). (The README still says React 18 / Router 6 — it's stale; trust `package.json`.)
+- **Entry flow:** `src/main.tsx` mounts `<BrowserRouter>` → `src/App.tsx` is the shell (title bar, nav, banner, footer) and declares the `<Routes>`. Pages live in `src/pages/`.
 - **Routes:** `/` → About, `/projects` → Projects, `/status` → Status, `/contact` → Contact, `*` falls back to About.
-- **Adding/removing a page requires two edits in `App.jsx` that must stay in sync:** the `PAGES` array (drives the nav menu *and* the per-route `document.title`) and the `<Routes>` block. They are separate declarations — updating one without the other silently breaks the nav or the route.
+- **Adding/removing a page requires two edits in `App.tsx` that must stay in sync:** the `PAGES` array (drives the nav menu *and* the per-route `document.title`) and the `<Routes>` block. They are separate declarations — updating one without the other silently breaks the nav or the route.
 - **Styling:** all CSS is in `src/styles.css`. The 2011 palette is preserved as CSS custom properties at the top of that file (`--orange`, `--orange-soft`, `--bg`, `--ink`, `--ink-dim`); reuse these tokens rather than hardcoding colors.
 - **Assets:** import from `src/assets/` (Vite hashes them) for anything that needs cache-busting; files in `public/` (e.g. `head.jpg`) are served verbatim.
 
@@ -30,8 +32,8 @@ There is **no lint or test setup** — `package.json` defines only `dev`/`build`
 
 This repo has **no backend**. Two pages reach outward at runtime:
 
-- **`Status.jsx`** polls `GET /api/valheim/status.json` same-origin every 30s. In production, Traefik routes `/api/valheim/*` to an in-cluster `valheim-status` snapshot service (curated JSON derived from Prometheus). Locally that path 404s, and the page degrades to an "Unknown"/error state — expected. It also has staleness logic (`STALE_AFTER = 180s`) that demotes a stale "up" snapshot.
-- **`Contact.jsx`** uses a `mailto:` fallback (no form backend). To wire a real handler, replace the `onSubmit` body with a `fetch()`.
+- **`Status.tsx`** polls `GET /api/valheim/status.json` same-origin every 30s. In production, Traefik routes `/api/valheim/*` to an in-cluster `valheim-status` snapshot service (curated JSON derived from Prometheus). Locally that path 404s, and the page degrades to an "Unknown"/error state — expected. It also has staleness logic (`STALE_AFTER = 180s`) that demotes a stale "up" snapshot.
+- **`Contact.tsx`** uses a `mailto:` fallback (no form backend). To wire a real handler, replace the `onSubmit` body with a `fetch()`.
 
 ## Deployment
 

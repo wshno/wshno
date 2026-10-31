@@ -28,12 +28,12 @@ npm run preview  # preview the production build
 │   ├── assets/
 │   │   └── wsh-icon.svg  # imported version (so Vite hashes it in build)
 │   ├── pages/
-│   │   ├── About.jsx     # landing — about copy + legacy price table
-│   │   ├── Projects.jsx  # tag-filtered list of projects
-│   │   ├── Status.jsx    # live Valheim server status (polls /api/valheim/status.json)
-│   │   └── Contact.jsx   # contact form (mailto: fallback, no backend)
-│   ├── App.jsx           # shell — title bar, nav, banner, footer
-│   ├── main.jsx          # entry point — mounts <BrowserRouter>
+│   │   ├── About.tsx     # landing — about copy + legacy price table
+│   │   ├── Projects.tsx  # tag-filtered list of projects
+│   │   ├── Status.tsx    # live Valheim server status (polls /api/valheim/status.json)
+│   │   └── Contact.tsx   # contact form (mailto: fallback, no backend)
+│   ├── App.tsx           # shell — title bar, nav, banner, footer
+│   ├── main.tsx          # entry point — mounts <BrowserRouter>
 │   └── styles.css        # all styling — preserves original palette
 ├── server/
 │   └── server.go         # stdlib-only static file server (container runtime)
@@ -80,7 +80,7 @@ Label a pull request **`deploy-feature`** and CI deploys an ephemeral preview to
 
 ## Contact form
 
-`Contact.jsx` currently `mailto:`s the form contents — works on any static host with zero backend. To wire it to a real form handler (Formspree, Resend, your own endpoint), swap the `onSubmit` body for a `fetch()` to your endpoint.
+`Contact.tsx` currently `mailto:`s the form contents — works on any static host with zero backend. To wire it to a real form handler (Formspree, Resend, your own endpoint), swap the `onSubmit` body for a `fetch()` to your endpoint.
 
 ## Credits
 
