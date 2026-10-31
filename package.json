@@ -24,14 +24,14 @@
     "@types/node": "26.6.5",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.7",
-    "@vitejs/plugin-react": "6.0.2",
+    "@vitejs/plugin-react": "6.1.2",
     "@wshno/eslint-config": "0.2.0",
     "@wshno/prettier-config": "0.1.1",
     "@wshno/tsconfig": "0.1.1",
     "eslint": "10.13.0",
     "prettier": "3.9.10",
     "typescript": "6.0.3",
-    "vite": "8.1.0"
+    "vite": "8.3.5"
   },
   "prettier": "@wshno/prettier-config"
 }
