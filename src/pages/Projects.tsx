@@ -37,7 +37,7 @@ const PROJECTS = [
 
 export default function Projects() {
   const allTags = useMemo(() => {
-    const s = new Set();
+    const s = new Set<string>();
     PROJECTS.forEach((p) => p.tags.forEach((t) => s.add(t)));
     return ["all", ...Array.from(s)];
   }, []);
@@ -67,8 +67,8 @@ export default function Projects() {
         ))}
       </div>
 
-      {filtered.map((p, i) => (
-        <article className="project" key={i}>
+      {filtered.map((p) => (
+        <article className="project" key={p.title}>
           <h2>{p.title}</h2>
           <p className="meta">{p.year}</p>
           <p>{p.description}</p>

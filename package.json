@@ -6,8 +6,14 @@
   "description": "Winther-Sørensen Hosting — homage to the 2011 wshosting.org",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "lint:ci": "eslint . --report-unused-disable-directives --format json",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "react": "19.2.6",
@@ -15,7 +21,17 @@
     "react-router-dom": "7.18.0"
   },
   "devDependencies": {
+    "@types/node": "26.6.5",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
     "@vitejs/plugin-react": "6.0.2",
+    "@wshno/eslint-config": "0.2.0",
+    "@wshno/prettier-config": "0.1.1",
+    "@wshno/tsconfig": "0.1.1",
+    "eslint": "10.13.0",
+    "prettier": "3.9.10",
+    "typescript": "6.0.3",
     "vite": "8.1.0"
-  }
+  },
+  "prettier": "@wshno/prettier-config"
 }

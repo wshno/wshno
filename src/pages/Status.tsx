@@ -1,5 +1,22 @@
 import { useEffect, useState } from "react";
 
+/** A [unix seconds, value] sample. */
+type Point = [number, number];
+
+/** The curated snapshot the <game>-status service serves. */
+interface Snapshot {
+  server?: string;
+  up: number;
+  updated: number;
+  players?: number;
+  maxPlayers?: number;
+  techTier?: number;
+  tech_tier?: number;
+  history?: { players?: Point[] };
+}
+
+type State = "up" | "down" | "stale" | "loading" | "unknown";
+
 // Same-origin: Traefik routes /api/<game>/* to the in-cluster <game>-status snapshot service,
 // which serves a curated JSON built from Prometheus. Grafana/Prometheus stay private.
 // Add a game by appending one entry here — the backend (<game>-status service + /api route)
@@ -13,7 +30,15 @@ const SERVERS = [
 const POLL_MS = 30000;
 const STALE_AFTER = 180; // seconds without a fresh snapshot before we distrust "up"
 
-function Sparkline({ points, height = 60, stroke = "#ffa600" }) {
+function Sparkline({
+  points,
+  height = 60,
+  stroke = "#ffa600",
+}: {
+  points: Point[];
+  height?: number;
+  stroke?: string;
+}) {
   if (!points || points.length < 2) return null;
   const width = 660;
   const ts = points.map((p) => p[0]);
@@ -21,8 +46,8 @@ function Sparkline({ points, height = 60, stroke = "#ffa600" }) {
   const minT = Math.min(...ts);
   const maxT = Math.max(...ts);
   const maxV = Math.max(1, ...vs);
-  const x = (t) => ((t - minT) / (maxT - minT || 1)) * width;
-  const y = (v) => height - (v / maxV) * (height - 4) - 2;
+  const x = (t: number) => ((t - minT) / (maxT - minT || 1)) * width;
+  const y = (v: number) => height - (v / maxV) * (height - 4) - 2;
   const line = points
     .map((p, i) => `${i ? "L" : "M"}${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`)
     .join(" ");
@@ -42,14 +67,14 @@ function Sparkline({ points, height = 60, stroke = "#ffa600" }) {
   );
 }
 
-function ago(sec) {
-  const d = Math.max(0, Math.floor(Date.now() / 1000) - sec);
+function ago(sec: number, now: number) {
+  const d = Math.max(0, Math.floor(now / 1000) - sec);
   if (d < 60) return `${d}s ago`;
   if (d < 3600) return `${Math.floor(d / 60)}m ago`;
   return `${Math.floor(d / 3600)}h ago`;
 }
 
-const LABELS = {
+const LABELS: Record<State, string> = {
   up: "Online",
   down: "Offline",
   stale: "Stale",
@@ -57,9 +82,18 @@ const LABELS = {
   unknown: "Unknown",
 };
 
-function ServerStatus({ name, endpoint }) {
-  const [data, setData] = useState(null);
-  const [err, setErr] = useState(null);
+function stateOf(data: Snapshot | null, err: string | null, now: number): State {
+  if (!data) return err ? "unknown" : "loading";
+  if (now / 1000 - data.updated > STALE_AFTER) return "stale";
+  return data.up === 1 ? "up" : "down";
+}
+
+function ServerStatus({ name, endpoint }: { name: string; endpoint: string }) {
+  const [data, setData] = useState<Snapshot | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  // When the last poll finished. Staleness and "updated … ago" are measured against it, so a
+  // render never reads the clock; every poll (success or failure) re-renders with a new value.
+  const [checkedAt, setCheckedAt] = useState(() => Date.now());
 
   useEffect(() => {
     let alive = true;
@@ -67,14 +101,15 @@ function ServerStatus({ name, endpoint }) {
       try {
         const r = await fetch(endpoint, { cache: "no-store" });
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        const j = await r.json();
+        const j = (await r.json()) as Snapshot;
         if (alive) {
           setData(j);
           setErr(null);
         }
       } catch (e) {
-        if (alive) setErr(e.message);
+        if (alive) setErr(e instanceof Error ? e.message : String(e));
       }
+      if (alive) setCheckedAt(Date.now());
     };
     load();
     const id = setInterval(load, POLL_MS);
@@ -84,19 +119,11 @@ function ServerStatus({ name, endpoint }) {
     };
   }, [endpoint]);
 
-  const stale = data && Date.now() / 1000 - data.updated > STALE_AFTER;
-  const state = err && !data
-    ? "unknown"
-    : !data
-      ? "loading"
-      : stale
-        ? "stale"
-        : data.up === 1
-          ? "up"
-          : "down";
+  const state = stateOf(data, err, checkedAt);
 
   // Satisfactory exposes a progression stat the others don't; show it only when present.
   const techTier = data?.techTier ?? data?.tech_tier ?? null;
+  const noDataText = err ? "Could not load status right now." : "Loading…";
 
   return (
     <article className="project">
@@ -115,16 +142,14 @@ function ServerStatus({ name, endpoint }) {
                 {" "}· tech tier <strong>{techTier}</strong>
               </>
             ) : null}{" "}
-            · updated {ago(data.updated)}
+            · updated {ago(data.updated, checkedAt)}
           </>
-        ) : err ? (
-          "Could not load status right now."
         ) : (
-          "Loading…"
+          noDataText
         )}
       </p>
 
-      {data?.history?.players?.length > 1 && (
+      {data?.history?.players && data.history.players.length > 1 && (
         <>
           <Sparkline points={data.history.players} />
           <p className="legend">Players online — last 24 hours</p>

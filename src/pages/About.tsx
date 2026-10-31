@@ -45,6 +45,8 @@ export default function About() {
           </tbody>
         </table>
 
+        {/* The 2011 layout: a header-less key/value list. <th> cells would restyle it. */}
+        {/* eslint-disable-next-line sonarjs/table-header */}
         <table>
           <tbody>
             <tr>

@@ -1,11 +1,15 @@
 import { useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
+
+type Field = "name" | "email" | "message";
 
 export default function Contact() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [sent, setSent] = useState(false);
-  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+  const set = (k: Field) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setForm({ ...form, [k]: e.target.value });
 
-  const onSubmit = (e) => {
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // No backend yet — drop a mailto so it works on a static host.
     // Swap this for a fetch() to your form-handler when you have one.
