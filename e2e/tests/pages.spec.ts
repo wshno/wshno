@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 
 test.describe('pages', () => {
   test('nav links set the route and the title', async ({ page }) => {

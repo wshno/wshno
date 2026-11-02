@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 
 // The /api/<game>/status.json snapshots come from cluster services, not the image, so each test
 // serves its own. An unrouted game gets index.html (the SPA fallback), which the page shows as
