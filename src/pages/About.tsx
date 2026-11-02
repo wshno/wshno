@@ -48,7 +48,7 @@ export default function About() {
           <tbody>
             <tr>
               <td>Setup fee</td>
-              <td style={{ color: 'red' }}>$0</td>
+              <td className="highlight">$0</td>
             </tr>
             <tr>
               <td>Domain name registration (com / net / org)</td>

@@ -77,8 +77,7 @@ export default function App() {
 
       <footer id="footer" className="wrap">
         <p>
-          WsHosting © 2007 – {YEAR} · Org. # 988 264 636 ·{' '}
-          <span style={{ opacity: 0.7 }}>Winther-Sørensen Hosting</span>
+          WsHosting © 2007 – {YEAR} · Org. # 988 264 636 · <span className="faint">Winther-Sørensen Hosting</span>
         </p>
       </footer>
     </>
