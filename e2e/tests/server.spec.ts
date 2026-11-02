@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 
 // server/server.go: hashed assets are cached for a year, the app shell is always revalidated, and
 // unknown paths fall back to index.html so client routes work on a cold load.

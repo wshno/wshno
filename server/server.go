@@ -7,6 +7,7 @@
 //   - index.html (and every SPA fallback) is served no-cache so deploys take effect
 //   - unknown paths fall back to index.html so React Router's BrowserRouter resolves
 //     client-side routes (/projects, /status, /contact, ...)
+//   - every response carries the security headers below
 //
 // Response compression is intentionally left to the ingress (Traefik) that fronts
 // the container, matching how the site is actually served.
@@ -22,6 +23,26 @@ import (
 	"time"
 )
 
+// The site loads nothing from other origins: Vite emits external scripts and stylesheets only, React's
+// style props go through the CSSOM (which style-src does not govern), and /api/* is same-origin, routed
+// by the ingress. The e2e suite fails on any violation, so a change that needs a new source (an asset
+// small enough for Vite to inline as a data: URI, say) shows up in the PR.
+const contentSecurityPolicy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; " +
+	"font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; " +
+	"frame-ancestors 'none'"
+
+var securityHeaders = map[string]string{
+	"Content-Security-Policy": contentSecurityPolicy,
+	// Not includeSubDomains: that would force HTTPS on every *.wsh.no name, and not all of them have it.
+	"Strict-Transport-Security": "max-age=31536000",
+	"X-Content-Type-Options":    "nosniff",
+	// frame-ancestors above supersedes this; kept for browsers that predate it.
+	"X-Frame-Options":            "DENY",
+	"Referrer-Policy":            "strict-origin-when-cross-origin",
+	"Permissions-Policy":         "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+	"Cross-Origin-Opener-Policy": "same-origin",
+}
+
 func main() {
 	root := envOr("WEB_ROOT", "/public")
 	addr := envOr("WEB_ADDR", ":8080")
@@ -33,6 +54,10 @@ func main() {
 		// Normalise to a clean, rooted URL path; path.Clean collapses any "..",
 		// so a joined filesystem path can't escape root.
 		upath := path.Clean("/" + strings.TrimPrefix(r.URL.Path, "/"))
+
+		for name, value := range securityHeaders {
+			w.Header().Set(name, value)
+		}
 
 		if strings.HasPrefix(upath, "/assets/") {
 			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
