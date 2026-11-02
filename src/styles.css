@@ -9,6 +9,9 @@
   --bg: #f2f2f2;
   --ink: #000;
   --ink-dim: #555;
+  /* The lightest grey and the brightest red that still reach 4.5:1 contrast on white (WCAG AA). */
+  --ink-faint: #707070;
+  --red: #d00000;
 }
 
 html,
@@ -294,4 +297,13 @@ button.tag {
   #header {
     height: 140px;
   }
+}
+
+/* Dimmed and highlighted text. Colors, not opacity: opacity also fades the contrast below WCAG AA. */
+.faint {
+  color: var(--ink-faint);
+}
+
+.highlight {
+  color: var(--red);
 }
