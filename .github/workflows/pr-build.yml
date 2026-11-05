@@ -25,5 +25,5 @@ jobs:
     secrets: inherit
     with:
       node_enabled: true
-      node_version: "24.x"
+      node_version: "26.x"
       node_test_enabled: false
