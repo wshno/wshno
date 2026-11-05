@@ -31,3 +31,21 @@ services:
       timeout: 3s
       retries: 40
       start_period: 3s
+
+  # The Playwright suite (e2e/Dockerfile on @wshno/playwright-config's runner image). Host network,
+  # so the specs reach the site on http://localhost:8080 exactly as a local `npx playwright test`
+  # does. Run with: docker compose -f docker-compose.e2e.yml --profile e2e run --rm playwright
+  playwright:
+    image: ${E2E_IMAGE:-wshno-e2e:local}
+    profiles: [e2e]
+    network_mode: host
+    environment:
+      - CI
+      - BASE_URL
+    # Reports land in e2e/ on the host, where the workflow's summary and upload look for them.
+    volumes:
+      - ./e2e/playwright-report:/e2e/playwright-report
+      - ./e2e/test-results:/e2e/test-results
+    depends_on:
+      web-ready:
+        condition: service_healthy
