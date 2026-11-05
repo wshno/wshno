@@ -23,7 +23,9 @@ ENV VITE_GIT_SHA=${GIT_SHA}
 RUN npm run build
 
 # --- runtime: distroless, nonroot, no shell or package manager ---
-FROM gcr.io/distroless/static-debian13:nonroot AS runtime
+# Pinned to the digest (distroless has no version tags) so Dependabot (docker, weekly) opens a PR
+# when Google rebuilds the image with Debian security fixes.
+FROM gcr.io/distroless/static-debian13:nonroot@sha256:25ac8f0c3b2334a9eb05452266bd4697864a8c8ef0ef71e5e6480d7f92868329 AS runtime
 COPY --from=server /server /server
 COPY --from=build /app/dist /public
 EXPOSE 8080
