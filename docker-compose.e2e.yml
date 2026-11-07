@@ -1,7 +1,7 @@
 # E2E compose stack for pr-e2e.yml (and local Playwright runs against a built image).
 #
-# The site image as it runs in the cluster: the stdlib Go server (server/server.go) serving the
-# built SPA on 8080. The /api/<game> status snapshots are cluster services, not part of the image;
+# The site image as it runs in the cluster: wshno/static-server (configured by static-server.json)
+# serving the built SPA on 8080. The /api/<game> status snapshots are cluster services, not part of the image;
 # the specs that need them serve their own.
 #
 # The image ref comes from WEB_IMAGE, so the same file works for any digest:
