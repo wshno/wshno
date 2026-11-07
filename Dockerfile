@@ -1,10 +1,3 @@
-# --- static file server (stdlib-only Go binary; see server/server.go) ---
-FROM golang:1.27-alpine AS server
-WORKDIR /src
-COPY server/go.mod ./
-COPY server/server.go ./
-RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /server .
-
 # --- frontend deps ---
 FROM node:26-alpine AS deps
 WORKDIR /app
@@ -22,11 +15,10 @@ ENV VITE_APP_VERSION=${APP_VERSION}
 ENV VITE_GIT_SHA=${GIT_SHA}
 RUN npm run build
 
-# --- runtime: distroless, nonroot, no shell or package manager ---
-# Pinned to the digest (distroless has no version tags) so Dependabot (docker, weekly) opens a PR
-# when Google rebuilds the image with Debian security fixes.
-FROM gcr.io/distroless/static-debian13:nonroot@sha256:25ac8f0c3b2334a9eb05452266bd4697864a8c8ef0ef71e5e6480d7f92868329 AS runtime
-COPY --from=server /server /server
+# --- runtime: wshno/static-server (stdlib-only Go server on distroless, nonroot, no shell) ---
+# static-server.json is the SPA fallback, the security headers and the /assets/ cache rule. Tag and
+# digest pinned, so Dependabot (docker, weekly) opens a PR for each static-server release, which is
+# also how distroless rebuilds with Debian security fixes arrive.
+FROM ghcr.io/wshno/static-server/server:0.1.0@sha256:9036422e3de9c774cc26a0f7ecf05e04bef2fea162653ec248691ee8c90abb94 AS runtime
+COPY static-server.json /etc/static-server/config.json
 COPY --from=build /app/dist /public
-EXPOSE 8080
-ENTRYPOINT ["/server"]

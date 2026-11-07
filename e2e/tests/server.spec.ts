@@ -1,6 +1,6 @@
 import { expect, test } from './fixtures'
 
-// server/server.go: hashed assets are cached for a year, the app shell is always revalidated, and
+// static-server.json: hashed assets are cached for a year, the app shell is always revalidated, and
 // unknown paths fall back to index.html so client routes work on a cold load.
 test.describe('static server', () => {
   test('serves the app shell with no-cache, including for client routes', async ({ request }) => {
@@ -23,8 +23,9 @@ test.describe('static server', () => {
   })
 
   test('does not serve files outside the web root', async ({ request }) => {
-    // path.Clean collapses the "..", so this resolves inside /public and falls back to the app shell.
-    const response = await request.get('/%2e%2e/server.go')
+    // The ".." is collapsed (and os.Root refuses to leave /public anyway), so this resolves inside
+    // the web root and falls back to the app shell.
+    const response = await request.get('/%2e%2e/etc/passwd')
     expect(response.status()).toBe(200)
     expect(await response.text()).toContain('<div id="root">')
   })

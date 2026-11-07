@@ -35,9 +35,8 @@ npm run preview  # preview the production build
 │   ├── App.tsx           # shell — title bar, nav, banner, footer
 │   ├── main.tsx          # entry point — mounts <BrowserRouter>
 │   └── styles.css        # all styling — preserves original palette
-├── server/
-│   └── server.go         # stdlib-only static file server (container runtime)
-├── Dockerfile            # multi-stage build → distroless runtime image
+├── static-server.json    # runtime config: SPA fallback, security headers, /assets/ caching
+├── Dockerfile            # multi-stage build → wshno/static-server runtime image
 └── index.html            # Vite HTML entry
 ```
 
@@ -67,7 +66,7 @@ The CSS preserves the original palette as custom properties at the top of `src/s
 
 The build outputs static files to `dist/`, so any static host works (Vercel, Netlify, GitHub Pages, etc.). Because we use `BrowserRouter`, a dumb static host needs to rewrite unknown paths to `/index.html` (single-page-app rewrite) — on Netlify drop a `public/_redirects` file with `/* /index.html 200`; on Vercel it's automatic. If you deploy under a subpath, set Vite's `base` option in `vite.config.js`.
 
-The canonical deploy is a **container**: a multi-stage `Dockerfile` builds the site and serves it from `server/server.go` (a tiny stdlib-only Go file server — SPA fallback, immutable `/assets/` caching) on a **distroless, non-root** base, listening on port `8080`. CI (`.github/workflows/container.yml`) builds, Grype-scans, and publishes it to `ghcr.io/.../web` on tagged releases. Run it locally with:
+The canonical deploy is a **container**: a multi-stage `Dockerfile` builds the site and serves it with [`wshno/static-server`](https://github.com/wshno/static-server) (a small stdlib-only Go file server, configured by `static-server.json`: SPA fallback, immutable `/assets/` caching, security headers) on a **distroless, non-root** base, listening on port `8080`. CI (`.github/workflows/container.yml`) builds, Grype-scans, and publishes it to `ghcr.io/.../web` on tagged releases. Run it locally with:
 
 ```bash
 docker build -t wsh-site .

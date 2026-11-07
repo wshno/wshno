@@ -2,7 +2,7 @@ import { parseCsp } from '@wshno/playwright-config'
 
 import { expect, test } from './fixtures'
 
-// server/server.go sets these on every response: the app shell, client routes and hashed assets.
+// static-server.json sets these on every response: the app shell, client routes and hashed assets.
 const expected = {
   'cross-origin-opener-policy': 'same-origin',
   'permissions-policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
