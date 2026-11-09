@@ -24,7 +24,7 @@
     "@types/node": "26.6.5",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.7",
-    "@vitejs/plugin-react": "6.1.2",
+    "@vitejs/plugin-react": "6.2.1",
     "@wshno/eslint-config": "0.2.0",
     "@wshno/prettier-config": "0.1.1",
     "@wshno/tsconfig": "0.1.1",
