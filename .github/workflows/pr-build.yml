@@ -1,4 +1,4 @@
-name: "PR build for wsh-site"
+name: CI
 
 # Thin trigger: delegates typecheck/build to the pr-build reusable workflow.
 # node-only repo; dotnet/python disabled. No test script defined yet, so

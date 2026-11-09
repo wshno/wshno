@@ -1,4 +1,4 @@
-name: "Publish web container to GHCR"
+name: Publish release
 
 # Release image: built, scanned, pushed and signed on v* tags (tag-and-release.yml dispatches this
 # workflow at the tag ref). Pull requests go through pr-e2e.yml instead.
