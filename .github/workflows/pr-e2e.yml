@@ -182,13 +182,16 @@ jobs:
       packages: read
       pull-requests: write
       actions: read
-    uses: hwinther/reusable-workflows/.github/workflows/playwright-e2e.yml@6b6810e17143f38ac9dc0f84d504e7ff08b1d2bf # v2.26.0
+    uses: hwinther/reusable-workflows/.github/workflows/playwright-e2e.yml@05d82fa2339b2085bae78c0faa55083c86e5da2e # v2.38.0
     with:
       compose_file: docker-compose.e2e.yml
       # The suite runs from the e2e image as a compose service, not with Node and browsers on the
       # runner: the same `docker compose --profile e2e run --rm playwright` as locally.
       compose_playwright_service: playwright
       playwright_working_directory: e2e
+      # The SPA's browser coverage (monocartReporter in e2e/playwright.config.ts): uploaded as
+      # e2e-coverage, and its Cobertura goes into quality-e2e for the quality artifact.
+      coverage_paths_json: '["monocart-coverage"]'
       image_artifacts_json: |
         {"WEB_IMAGE":"${{ needs.build.outputs.image }}",
          "E2E_IMAGE":"${{ needs.e2e-image.outputs.image }}"}
@@ -300,7 +303,7 @@ jobs:
       contents: read
       packages: write
       id-token: write
-    uses: hwinther/reusable-workflows/.github/workflows/quality-artifact.yml@6b6810e17143f38ac9dc0f84d504e7ff08b1d2bf # v2.26.0
+    uses: hwinther/reusable-workflows/.github/workflows/quality-artifact.yml@05d82fa2339b2085bae78c0faa55083c86e5da2e # v2.38.0
     with:
       tags: |
         ${{ needs.main-tag.outputs.tag }}
