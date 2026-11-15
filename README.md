@@ -1,5 +1,14 @@
 # WSH — wshosting.org
 
+| | |
+|---|---|
+| **Build and release** | [![E2E on main](https://github.com/wshno/wshno/actions/workflows/pr-e2e.yml/badge.svg?branch=main&event=push)](https://github.com/wshno/wshno/actions/workflows/pr-e2e.yml) [![Release](https://github.com/wshno/wshno/actions/workflows/container.yml/badge.svg)](https://github.com/wshno/wshno/actions/workflows/container.yml) |
+| **Tests** | [![E2E tests](https://wshno.github.io/wshno/badges/tests-e2e.svg)](https://github.com/wshno/wshno/actions/workflows/pr-e2e.yml?query=branch%3Amain+event%3Apush) |
+| **Coverage** | [![E2E coverage](https://wshno.github.io/wshno/badges/coverage-e2e.svg)](https://github.com/wshno/wshno/actions/workflows/pr-e2e.yml?query=branch%3Amain+event%3Apush) |
+| **Security** | [![Image vulnerabilities (Grype)](https://wshno.github.io/wshno/badges/vulnerabilities.svg)](https://github.com/wshno/wshno/actions/workflows/pr-e2e.yml?query=branch%3Amain+event%3Apush) [![zizmor - GitHub Actions SAST](https://github.com/wshno/wshno/actions/workflows/zizmor.yml/badge.svg?branch=main)](https://github.com/wshno/wshno/actions/workflows/zizmor.yml) [![poutine - GitHub Actions SAST](https://github.com/wshno/wshno/actions/workflows/poutine.yml/badge.svg?branch=main)](https://github.com/wshno/wshno/actions/workflows/poutine.yml) |
+
+Badges: [https://wshno.github.io/wshno/](https://wshno.github.io/wshno/), from the quality summary of every E2E run on main ([`pages.yml`](https://github.com/wshno/wshno/blob/main/.github/workflows/pages.yml)).
+
 Personal site for **Winther-Sørensen Hosting**. A React SPA that pays homage to the original 2011 wshosting.org design (orange-bordered "wrap" cards, head-image banner, Arial, three-page structure) but built on a modern Vite + React stack.
 
 ## Stack
