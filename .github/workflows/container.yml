@@ -37,6 +37,9 @@ jobs:
       build_context: .
       dockerfile: Dockerfile
       grype_fail_build: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.grype_fail_build == 'false' && 'never' || 'auto' }}
+      # The job has contents: read, and attaching the SBOMs to the GitHub release needs contents: write.
+      # They stay available as workflow artifacts and as the cosign SBOM attestation in GHCR.
+      release_asset_upload_enabled: false
 
   # Renders deploy/ with the image just pushed (tag@digest), and ships it as a signed OCI artifact
   # (ghcr.io/wshno/wshno/manifests:<version>) for Flux in hwinther/proxmox to pull. Release builds
