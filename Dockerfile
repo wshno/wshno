@@ -19,6 +19,6 @@ RUN npm run build
 # static-server.json is the SPA fallback, the security headers and the /assets/ cache rule. Tag and
 # digest pinned, so Dependabot (docker, weekly) opens a PR for each static-server release, which is
 # also how distroless rebuilds with Debian security fixes arrive.
-FROM ghcr.io/wshno/static-server/server:0.1.0@sha256:9036422e3de9c774cc26a0f7ecf05e04bef2fea162653ec248691ee8c90abb94 AS runtime
+FROM ghcr.io/wshno/static-server/server:0.2.1@sha256:0f93a3658da63f0da8712aa5f8c6e469272d81a914786dcaf7c3c38378350c6e AS runtime
 COPY static-server.json /etc/static-server/config.json
 COPY --from=build /app/dist /public
